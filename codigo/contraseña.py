@@ -1,65 +1,138 @@
+import hashlib
+
 class Usuario:
     #constructor
-    def __init__(self, nombre_usuario, contraseña_usuario, email_usuario, pregunta_1, respuesta_1, pregunta_2, respuesta_2):
-        self.nombre_usuario = nombre_usuario
-        self.contraseña_usuario = contraseña_usuario
+    def __init__(self, nombre_usuario, email_usuario):
         self.email_usuario= email_usuario
-        self.pregunta_recuperacion_1= pregunta_1
-        self.respuesta_recuperacion_1= respuesta_1
-        self.pregunta_recuperacion_2= pregunta_2
-        self.respuesta_recuperacion_2= respuesta_2
+        self.pass_list = {}
+        self.cargar_datos()
+        
+    def cargar_datos(self):
+        try:
+            with open('contraseñas.txt', 'r') as archivo:
+                texto = archivo.readlines()
+                for linea in texto:
+                    if linea.startswith(f'Usuario: {self.email_usuario}'):
+                        contenido = linea.strip().split(", ")
+                        for partes in contenido:
+                            if "Plataforma: " in partes:
+                                plataforma = partes.split(": ")[1]
+                            elif "Contraseña: " in partes:
+                                contrasena = partes.split(": ")[1]
+                        self.pass_list[plataforma] = contrasena
+        except FileNotFoundError:
+            pass
+        
+    def encriptado_contrasena(self, contrasena):
+        encriptado=hashlib.sha256(contrasena.encode())
+        return encriptado.hexdigest()
     
+    def agregar_constrasena(self, buffer, contrasena, email):
+            self.pass_list[buffer] = self.encriptado_contrasena(contrasena)
+            self.guardar_contrasena(buffer, self.pass_list[buffer]) 
 
-    def modificar_contraseña(self,nueva_contraseña, contraseña_anterior, email):
-        #validacion_correo & contraseña
-        if (self.email_usuario == email):
-            if(self.contraseña_usuario == contraseña_anterior):
-                self.contraseña_usuario= nueva_contraseña
-                print ('Contraseña cambiada correctamente')
+    def guardar_contrasena(self, buffer, contrasena_encriptada):
+        with open('contraseñas.txt', 'a') as file:
+            file.write(f'Usuario: {self.email_usuario}, Plataforma: {buffer}, Contraseña: {contrasena_encriptada}\n')
 
+    def eliminar_contrasena(self, email):
+        if self.email_usuario == email :
+            print("¿Qué constraseña deseas eliminar?")
+
+            for item in range(len(list(self.pass_list.keys()))):
+                print("{} .- {}".format(item, self.pass_list))
+            
+            opcion = int(input("Seleccione: "))
+            remover = list(self.pass_list.keys())[opcion]
+
+            try:
+                if opcion not in range(len(list(self.pass_list.keys()))):
+                    print("seleccione una opción válida")
+                
+                else:
+                    del self.pass_list[remover]
+            except:
+                print("Opción no válida")
+
+    def modificar_contraseña(self,email):
+        if self.email_usuario == email :
+            print("¿Qué constraseña deseas modificar?")
+
+            for item, key in enumerate(self.pass_list.keys()):
+                print("{} .- {}".format(item, key))
+            
+            opcion = int(input("Seleccione: "))
+            modificar = list(self.pass_list.keys())[opcion]
+
+            try:
+                if opcion not in range(len(self.pass_list.keys())):
+                    print("seleccione una opción válida")
+                
+                else:
+                    contraseña_anterior = input("Ingrese contraseña anterior: ")
+                    if(self.pass_list[modificar] == contraseña_anterior):
+                        contraseña_nueva = input("Ingrese contraseña nueva: ")
+                        self.pass_list[modificar]= contraseña_nueva
+                        print ('Contraseña cambiada correctamente')  
+                    else: 
+                        print('La contraseña no ha podido ser modificada, verificar datos enviados')
+
+            except:
+                print("Opción no válida")
         else:
             print('La contraseña no ha podido ser modificada, verificar datos enviados')
 
-    def recuperar_contraseña(self, email, respuesta_1, respuesta_2):
-        #validacion_correo & contraseña
-        if (self.email_usuario == email):
-            if(self.respuesta_recuperacion_1 == respuesta_1):
-                if(self.respuesta_recuperacion_2 == respuesta_2): 
-                    print('Datos verificados correctamente')
-                    print('La contraseña recuperada es:'+ self.contraseña_usuario) 
-                else: 
-                    print('Respuesta invalida')
-            else: 
-                print('Respuesta invalida')
+    def recuperar_contraseña(self, email):
+        if self.email_usuario == email :
+            print("¿Qué constraseña deseas recuperar?")
 
+            for item, key in enumerate(self.pass_list.keys()):
+                print("{} .- {}".format(item, key))
+            
+            opcion = int(input("Seleccione: "))
+            recuperar = list(self.pass_list.keys())[opcion]
+
+            try:
+                if opcion not in range(len(self.pass_list.keys())):
+                    print("seleccione una opción válida")
+                
+                else:
+                    print("La contraseña es: "+ str(self.pass_list[recuperar]))
+            except:
+                print("Opción no válida")
         else:
-            print('La contraseña no ha podido ser modificada, verificar datos enviados')
-
+            print('La contraseña no ha podido ser recuperada, verificar datos enviados')
 
 #Usuario de ejemplo
-usuario_ej = Usuario('usuario1', 'contraseña1', 'usuario1@gmail.com','Pregunta 1', 'Respuesta 1','Pregunta 2', 'Respuesta 2')
+usuario_ej = Usuario('usuario1', 'usuario1@gmail.com')
 
 try:
-    accion = float(input('¿Qué desea hacer?:\n (1) Registro \n (2) Modificar contraseña \n (3) Recuperar contraseña \n (4)Eliminar contraseña \n'))
+    accion = float(input('¿Qué desea hacer?:\n (1) Registro \n (2) Modificar contraseña \n (3) Recuperar contraseña \n (4) Eliminar contraseña \n'))
     if (accion not in [1,2,3,4]):
         print('Opción no valida')
 
-    if (accion == 2):
+    elif (accion == 1):
+        correo = input("Ingrese su correo para agregar una contraseña: ")
+        nombre = input("Ingrese a la plataforma que pertenece esta contraseña: ")
+        contrasena = input("Ingrese la contraseña: ")
+        #Eliminar esto
+        usuario_ej.agregar_constrasena(nombre, contrasena, correo)
+
+    elif (accion == 2):
         correo = input('Ingrese su correo para modificar contraseña: ')
-        contraseña_antigua = input('Ingrese su contraseña antigua: ')
-        contraseña_nueva = input('Ingrese su contraseña nueva: ')
         #Hay que cambiar esta linea cuando juntemos los programas!!!!
-        usuario_ej.modificar_contraseña(contraseña_nueva, contraseña_antigua, correo)
+        usuario_ej.modificar_contraseña(correo)
 
     elif (accion == 3):
         correo = input('Ingrese su correo para recuperar contraseña: ')
-        print(usuario_ej.pregunta_recuperacion_1)
-        respuesta_1 = input('Ingrese su respuesta: ')
-        print(usuario_ej.pregunta_recuperacion_2)
-        respuesta_2 = input('Ingrese su respuesta: ')
         #Hay que cambiar esta linea cuando juntemos los programas!!!!
-        usuario_ej.recuperar_contraseña(correo, respuesta_1, respuesta_2)
+        usuario_ej.recuperar_contraseña(correo)
+    
+    elif (accion == 4):
+        correo = input("Ingrese su correo para eliminar una contraseña: ")
+        #Eliminar esto después
+        usuario_ej.eliminar_contrasena(correo)
 
 except ValueError:
-   exit('Opción no valida')
-  
+   exit('Opción no valida') 
+
