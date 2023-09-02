@@ -2,7 +2,7 @@ import hashlib
 
 class Usuario:
     #constructor
-    def __init__(self, nombre_usuario, email_usuario):
+    def __init__(self, email_usuario):
         self.email_usuario= email_usuario
         self.pass_list = {}
         self.cargar_datos()
@@ -34,23 +34,41 @@ class Usuario:
     def guardar_contrasena(self, buffer, contrasena_encriptada):
         with open('contraseñas.txt', 'a') as file:
             file.write(f'Usuario: {self.email_usuario}, Plataforma: {buffer}, Contraseña: {contrasena_encriptada}\n')
+    
+    def actualizar_txt(self):
+        try:
+            with open('contraseñas.txt', 'r') as archivo:
+                lineas = archivo.readlines()
+            
+            with open('contraseñas.txt', 'w') as archivo:
+                for linea in lineas:
+                    if not linea.startswith(f'Usuario: {self.email_usuario}'): #Filtro por correo usuario
+                        archivo.write(linea)
+            
+            with open('contraseñas.txt', 'a') as archivo:
+                for plataforma, contrasena in self.pass_list.items():
+                    archivo.write(f'Usuario: {self.email_usuario}, Plataforma: {plataforma}, Contraseña: {contrasena}\n')
+        except FileNotFoundError:
+            pass
 
     def eliminar_contrasena(self, email):
         if self.email_usuario == email :
             print("¿Qué constraseña deseas eliminar?")
 
-            for item in range(len(list(self.pass_list.keys()))):
-                print("{} .- {}".format(item, self.pass_list))
+            opciones = list(self.pass_list.keys())
+            for indice, plataforma in enumerate(opciones):
+                print(f"{indice + 1}. {plataforma}")
             
-            opcion = int(input("Seleccione: "))
-            remover = list(self.pass_list.keys())[opcion]
+            opcion = int(input("Seleccione: ")) - 1 
 
             try:
-                if opcion not in range(len(list(self.pass_list.keys()))):
-                    print("seleccione una opción válida")
+                if opcion not in range(len(opciones)):
+                    print("Seleccione una opcion válida.")
                 
                 else:
+                    remover = opciones[opcion]
                     del self.pass_list[remover]
+                    self.actualizar_txt()
             except:
                 print("Opción no válida")
 
@@ -58,22 +76,26 @@ class Usuario:
         if self.email_usuario == email :
             print("¿Qué constraseña deseas modificar?")
 
-            for item, key in enumerate(self.pass_list.keys()):
-                print("{} .- {}".format(item, key))
+            opciones = list(self.pass_list.keys())
+            for indice, plataforma in enumerate(opciones):
+                print(f"{indice + 1}. {plataforma}")
             
-            opcion = int(input("Seleccione: "))
-            modificar = list(self.pass_list.keys())[opcion]
+            opcion = int(input("Seleccione: ")) - 1
 
             try:
-                if opcion not in range(len(self.pass_list.keys())):
+                if opcion not in range(len(opciones)):
                     print("seleccione una opción válida")
                 
                 else:
+                    modificar = opciones[opcion]
                     contraseña_anterior = input("Ingrese contraseña anterior: ")
-                    if(self.pass_list[modificar] == contraseña_anterior):
-                        contraseña_nueva = input("Ingrese contraseña nueva: ")
-                        self.pass_list[modificar]= contraseña_nueva
-                        print ('Contraseña cambiada correctamente')  
+
+                    if modificar in self.pass_list:
+                        if self.pass_list[modificar] == self.encriptado_contrasena(contraseña_anterior):
+                            contraseña_nueva = input("Ingrese contraseña nueva: ")
+                            self.pass_list[modificar]= self.encriptado_contrasena(contraseña_nueva)
+                            self.actualizar_txt()
+                            print ('Contraseña cambiada correctamente')  
                     else: 
                         print('La contraseña no ha podido ser modificada, verificar datos enviados')
 
@@ -84,27 +106,30 @@ class Usuario:
 
     def recuperar_contraseña(self, email):
         if self.email_usuario == email :
+            opciones = list(self.pass_list.keys())
+
             print("¿Qué constraseña deseas recuperar?")
 
-            for item, key in enumerate(self.pass_list.keys()):
-                print("{} .- {}".format(item, key))
-            
-            opcion = int(input("Seleccione: "))
-            recuperar = list(self.pass_list.keys())[opcion]
+            for indicee, plataforma in enumerate(opciones):
+                print(f'{indicee + 1}. {plataforma}')
+           
+            opcion = int(input("Seleccione: ")) - 1
 
             try:
-                if opcion not in range(len(self.pass_list.keys())):
-                    print("seleccione una opción válida")
-                
+                if opcion in range(len(opciones)):
+                    recuperar = opciones[opcion]
+                    contrasena_encriptada = self.pass_list[recuperar]
+                    contrasena_desincriptada = self.desencriptar(contrasena_encriptada)
+                    print(f"La contraseña para {recuperar} es: {contrasena_desincriptada}")
                 else:
-                    print("La contraseña es: "+ str(self.pass_list[recuperar]))
+                    print('Opción no válida.')
             except:
                 print("Opción no válida")
         else:
             print('La contraseña no ha podido ser recuperada, verificar datos enviados')
 
 #Usuario de ejemplo
-usuario_ej = Usuario('usuario1', 'usuario1@gmail.com')
+usuario_ej = Usuario('usuario1@gmail.com')
 
 try:
     accion = float(input('¿Qué desea hacer?:\n (1) Registro \n (2) Modificar contraseña \n (3) Recuperar contraseña \n (4) Eliminar contraseña \n'))
