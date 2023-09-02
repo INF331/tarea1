@@ -1,5 +1,4 @@
 import hashlib
-
 class Usuario:
     #constructor
     def __init__(self, email_usuario):
@@ -28,7 +27,8 @@ class Usuario:
         return encriptado.hexdigest()
     
     def agregar_constrasena(self, buffer, contrasena, email):
-            self.pass_list[buffer] = self.encriptado_contrasena(contrasena)
+            #self.pass_list[buffer] = self.encriptado_contrasena(contrasena)
+            self.pass_list[buffer] = contrasena
             self.guardar_contrasena(buffer, self.pass_list[buffer]) 
 
     def guardar_contrasena(self, buffer, contrasena_encriptada):
@@ -91,9 +91,11 @@ class Usuario:
                     contraseña_anterior = input("Ingrese contraseña anterior: ")
 
                     if modificar in self.pass_list:
-                        if self.pass_list[modificar] == self.encriptado_contrasena(contraseña_anterior):
+                        #if self.pass_list[modificar] == self.encriptado_contrasena(contraseña_anterior):
+                        if self.pass_list[modificar] == contraseña_anterior:
                             contraseña_nueva = input("Ingrese contraseña nueva: ")
-                            self.pass_list[modificar]= self.encriptado_contrasena(contraseña_nueva)
+                            #self.pass_list[modificar]= self.encriptado_contrasena(contraseña_nueva)
+                            self.pass_list[modificar]= contraseña_nueva
                             self.actualizar_txt()
                             print ('Contraseña cambiada correctamente')  
                     else: 
@@ -117,10 +119,13 @@ class Usuario:
 
             try:
                 if opcion in range(len(opciones)):
-                    recuperar = opciones[opcion]
+                    '''recuperar = opciones[opcion]
                     contrasena_encriptada = self.pass_list[recuperar]
                     contrasena_desincriptada = self.desencriptar(contrasena_encriptada)
-                    print(f"La contraseña para {recuperar} es: {contrasena_desincriptada}")
+                    print(f"La contraseña para {recuperar} es: {contrasena_desincriptada}")'''
+                    recuperar = opciones[opcion]
+                    contrasena = self.pass_list[recuperar]
+                    print(f"La contraseña para {recuperar} es: {contrasena}")
                 else:
                     print('Opción no válida.')
             except:
