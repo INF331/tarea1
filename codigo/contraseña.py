@@ -1,4 +1,28 @@
 import hashlib
+import secrets
+import string
+def generador_contrasenas(longitud,cantidad_mayusculas,cantidad_especiales,cantidad_numeros):
+        caracteres = string.ascii_lowercase
+        contrasena = ''
+
+        if cantidad_mayusculas != 0:
+            caracteres += string.ascii_uppercase  # Mayúsculas
+            contrasena += ''.join(secrets.choice(string.ascii_uppercase) for _ in range(cantidad_mayusculas))
+
+        if cantidad_numeros != 0:
+            caracteres += string.digits  # Números
+            contrasena += ''.join(secrets.choice(string.digits) for _ in range(cantidad_numeros))
+
+        if cantidad_especiales != 0:
+            caracteres += string.punctuation  # Caracteres especiales
+            contrasena += ''.join(secrets.choice(string.punctuation) for _ in range(cantidad_especiales))
+
+        if longitud > len(contrasena):
+            faltan = longitud - len(contrasena)
+            contrasena += ''.join(secrets.choice(caracteres) for _ in range(faltan))
+
+        contrasena = ''.join(secrets.SystemRandom().sample(contrasena, len(contrasena)))
+        return contrasena
 class Usuario:
     #constructor
     def __init__(self, email_usuario):
@@ -133,12 +157,13 @@ class Usuario:
         else:
             print('La contraseña no ha podido ser recuperada, verificar datos enviados')
 
+
 #Usuario de ejemplo
 usuario_ej = Usuario('usuario1@gmail.com')
 
 try:
-    accion = float(input('¿Qué desea hacer?:\n (1) Registro \n (2) Modificar contraseña \n (3) Recuperar contraseña \n (4) Eliminar contraseña \n'))
-    if (accion not in [1,2,3,4]):
+    accion = float(input('¿Qué desea hacer?:\n (1) Registro \n (2) Modificar contraseña \n (3) Recuperar contraseña \n (4) Eliminar contraseña \n (5) Generador de contraseñas \n'))
+    if (accion not in [1,2,3,4,5]):
         print('Opción no valida')
 
     elif (accion == 1):
@@ -162,6 +187,30 @@ try:
         correo = input("Ingrese su correo para eliminar una contraseña: ")
         #Eliminar esto después
         usuario_ej.eliminar_contrasena(correo)
+    
+    elif (accion == 5):
+        longitud = int(input("Ingrese la longitud de la contraseña que desea generar: "))
+
+        mayusculas = input("¿La contraseña generada debe incluir mayúsculas?(S/N): ")
+        if (mayusculas == 'S'):
+            cantidad_mayusculas = int(input("¿La contraseña generada cuantas mayúsculas debe incluir?: "))
+        else:
+            cantidad_mayusculas = 0
+
+        especiales = input("¿La contraseña generada debe incluir carácteres especiales?(S/N): ")
+        if (especiales == 'S'):
+            cantidad_especiales = int(input("¿La contraseña generada cuantos carácteres especiales debe incluir?: "))
+        else:
+            cantidad_especiales = 0
+
+        numeros = input("¿La contraseña generada debe incluir números?(S/N): ")
+        if (numeros == 'S'):
+            cantidad_numeros = int(input("¿La contraseña generada cuantos números debe incluir?: "))
+        else:
+            cantidad_numeros = 0
+        
+        contrasena_generada = generador_contrasenas(longitud, cantidad_mayusculas, cantidad_especiales, cantidad_numeros)
+        print('La contraseña generada es: ' + contrasena_generada)
 
 except ValueError:
    exit('Opción no valida') 
