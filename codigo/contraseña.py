@@ -1,6 +1,7 @@
 import hashlib
 import secrets
 import string
+
 def generador_contrasenas(longitud,cantidad_mayusculas,cantidad_especiales,cantidad_numeros):
         caracteres = string.ascii_lowercase
         contrasena = ''
@@ -23,6 +24,7 @@ def generador_contrasenas(longitud,cantidad_mayusculas,cantidad_especiales,canti
 
         contrasena = ''.join(secrets.SystemRandom().sample(contrasena, len(contrasena)))
         return contrasena
+
 class Usuario:
     #constructor
     def __init__(self, email_usuario):
@@ -158,35 +160,28 @@ class Usuario:
             print('La contraseña no ha podido ser recuperada, verificar datos enviados')
 
 
-#Usuario de ejemplo
-usuario_ej = Usuario('usuario1@gmail.com')
-
 try:
+
+    correo = input("Ingrese su correo electrónico: ")
+    usuario = Usuario(correo)
+
     accion = float(input('¿Qué desea hacer?:\n (1) Registro \n (2) Modificar contraseña \n (3) Recuperar contraseña \n (4) Eliminar contraseña \n (5) Generador de contraseñas \n'))
     if (accion not in [1,2,3,4,5]):
         print('Opción no valida')
 
     elif (accion == 1):
-        correo = input("Ingrese su correo para agregar una contraseña: ")
         nombre = input("Ingrese a la plataforma que pertenece esta contraseña: ")
         contrasena = input("Ingrese la contraseña: ")
-        #Eliminar esto
-        usuario_ej.agregar_constrasena(nombre, contrasena, correo)
+        usuario.agregar_constrasena(nombre, contrasena, correo)
 
     elif (accion == 2):
-        correo = input('Ingrese su correo para modificar contraseña: ')
-        #Hay que cambiar esta linea cuando juntemos los programas!!!!
-        usuario_ej.modificar_contraseña(correo)
+        usuario.modificar_contraseña(correo)
 
     elif (accion == 3):
-        correo = input('Ingrese su correo para recuperar contraseña: ')
-        #Hay que cambiar esta linea cuando juntemos los programas!!!!
-        usuario_ej.recuperar_contraseña(correo)
+        usuario.recuperar_contraseña(correo)
     
     elif (accion == 4):
-        correo = input("Ingrese su correo para eliminar una contraseña: ")
-        #Eliminar esto después
-        usuario_ej.eliminar_contrasena(correo)
+        usuario.eliminar_contrasena(correo)
     
     elif (accion == 5):
         longitud = int(input("Ingrese la longitud de la contraseña que desea generar: "))
