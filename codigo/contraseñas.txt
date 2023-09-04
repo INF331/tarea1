@@ -3,3 +3,4 @@ Usuario: usuario1@gmail.com, Plataforma: face2, Contraseña: 1234567
 Usuario: usuario1@gmail.com, Plataforma: face3, Contraseña: 5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5
 Usuario: usuario1@gmail.com, Plataforma: inta 4, Contraseña: a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3
 Usuario: usuario1@gmail.com, Plataforma: Instagram , Contraseña: 123
+Usuario: user@mail.com, Plataforma: fb, Contraseña: 9XDxdxd??
